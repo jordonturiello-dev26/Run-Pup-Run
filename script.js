@@ -2,7 +2,7 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = 400;
+canvas.width = 800;
 canvas.height = 600;
 
 // Main Game Loop
@@ -35,7 +35,7 @@ class Pup {
         this.velocity = 0; // current speed
         this.gravity = 0.25; // pup fall speed
         this.jumpStrength = -4.6; // pup jump speed
-        this.maxVelocity = 10;  // max velocity
+        this.MaxVelocity = 10;  // max velocity
 
         // Sprite aimation
         this.image = new Image(); // creates image object

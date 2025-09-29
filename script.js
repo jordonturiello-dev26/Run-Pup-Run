@@ -5,7 +5,7 @@ const ctx = canvas.getContext("2d");
 canvas.width = 800;
 canvas.height = 600;
 
-// Main Game Loop
+// Main Game Loop //
 function gameLoop() { // called every frame
   update(); // move objects, check collisions
   draw();   // clear + redraw everything
@@ -14,6 +14,8 @@ function gameLoop() { // called every frame
 
 function update() {
   pup.update();
+
+  pipes.forEach(pipe => pipe.update());
 }
 
 function draw() {
@@ -23,19 +25,22 @@ function draw() {
   ctx.fillStyle = "#87ceeb"; 
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+// Pipes
+pipes.forEach(pipe => pipe.draw(ctx));
+
 // Pup
   pup.draw(ctx);
 }
 
-// Pup Class
+// Pup Class //
 class Pup {
     constructor(x, y, spriteSrc, frameWidth, frameHeight, frameCount) {
         this.x = x;
         this.y = y;
         this.velocity = 0; // current speed
         this.gravity = 0.25; // pup fall speed
-        this.jumpStrength = -4.6; // pup jump speed
-        this.MaxVelocity = 10;  // max velocity
+        this.jumpStrength = -6 // pup jump speed
+        this.maxVelocity = 8;  // max velocity
 
         // Sprite aimation
         this.image = new Image(); // creates image object
@@ -60,8 +65,8 @@ class Pup {
       this.velocity += this.gravity; // gravity
 
       // Add max velocity cap
-      if (this.velocity > this.maxvelocity) {
-      this.y += this.velocity; 
+      if (this.velocity > this.maxVelocity) {
+      this.velocity = this.maxVelocity; 
       }
 
       // Move pup
@@ -75,19 +80,70 @@ class Pup {
         }
     }
 
-    // Draw method:
+    // Draw pup method:
     draw(ctx) {
         ctx.drawImage(
             this.image,
             this.currentFrame * this.frameWidth, 0, // source x, y
             this.frameWidth, this.frameHeight, // source width, height
             this.x, this.y, // canvas position 
-            this.frameWidth * 2, this.frameHeight * 2 // scale up
+            this.frameWidth * 3, this.frameHeight * 3 // scale up
         );
     }
 }
+
+// Pipe Class
+class Pipe {
+  constructor(x, width, gapHeight, canvasHeight, speed) {
+    this.x = x; //starting position
+    this.width = width; // pipe width
+    this.gapHeight = gapHeight; // size of the gap between pipes
+    this.canvasHeight = canvasHeight; // so pipes fill full canvas height
+    this.speed = speed; // speed moving left
+
+    //Randomise vertical gap position
+    this.gapY = Math.floor(Math.random() * (canvasHeight - this.gapHeight - 40)) + 20;
+  }
+
+  update() {
+    this.x -= this.speed; // move pipe left
+
+    // if pipe goes off screen, reset to right
+    if (this.x + this.width < 0) {
+      this.x = canvas.width;
+      this.gapY = Math.floor(Math.random() * (this.canvasHeight - this.gapHeight - 40)) + 20;
+    }
+  }
+  
+  draw(ctx) {
+      ctx.fillStyle = "green";
+      ctx.fillRect(this.x, 0, this.width, this.gapY); // top pipe
+      ctx.fillRect(this.x, this.gapY + this.gapHeight, this.width, this.canvasHeight - (this.gapY + this.gapHeight)); // bottom pipe
+    }    
+}
+
+// Pipe setup
+const pipes = [];
+const pipeWidth = 60;
+const pipeGap = 140;
+const pipeSpeed = 2;
+
+// adds 3 pipes, spaced 300px apart
+for (let i = 0; i < 3; i++) {
+  pipes.push(new Pipe(canvas.width + i * 400, pipeWidth, pipeGap, canvas.height, pipeSpeed));
+}
+
 // Pup instance
-  const pup = new Pup(50, 250, "assets/dog-character-1.png", 32, 32, 1);
+const pup = new Pup(50, 250, "assets/dog-character-1.png", 32, 32, 1);
+
+pup.image.onload = () => {
+  console.log("✅ Pup image loaded!");
+  gameLoop();
+};
+
+pup.image.onerror = () => {
+  console.error("❌ Could not load pup image: assets/dog-character-1.png");
+};
 
 // Game Controls
 document.addEventListener("keydown", (e) => {

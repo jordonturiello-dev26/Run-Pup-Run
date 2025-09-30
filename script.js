@@ -4,6 +4,9 @@ const ctx = canvas.getContext("2d");
 canvas.width = 800;
 canvas.height = 600;
 
+const background = new Image();
+background.src = "assets/background.png";
+
 // ---------------- MIAN GAME LOOP ---------------- //
 function gameLoop() { 
   update(); 
@@ -19,8 +22,7 @@ function update() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = "#87ceeb"; 
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
   pipes.forEach(pipe => pipe.draw(ctx));
 
@@ -66,13 +68,13 @@ class Pup {
       // Move pup
       this.y += this.velocity;
 
-    //Animation frame update
-    this.frameTimer++;
-    if (this.frameTimer >= this.frameInterval) {
-        this.currentFrame = (this.currentFrame + 1) % this.frameCount;
-        this.frameTimer = 0;
-        }
-    }
+      //Animation frame update
+      this.frameTimer++;
+      if (this.frameTimer >= this.frameInterval) {
+          this.currentFrame = (this.currentFrame + 1) % this.frameCount;
+          this.frameTimer = 0;
+          }
+      }
 
     // Draw pup method:
     draw(ctx) {
